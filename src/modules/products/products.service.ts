@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { Firestore } from 'firebase-admin/firestore';
 import { FIRESTORE } from '../firebase/firebase.constants.ts';
 import { FilterProductsDto } from './dto/filter-product.dto.ts';
+import { ProductSize } from './interfaces/products.interface.ts';
 
 @Injectable()
 export class ProductsService {
@@ -17,34 +18,39 @@ export class ProductsService {
       ...doc.data(),
     })) as any[];
 
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
+    const search = filters.search;
+    if (search) {
+      const searchTerm = search.toLowerCase();
       products = products.filter((p) =>
         p.name.toLowerCase().includes(searchTerm),
       );
     }
 
-    if (filters.category) {
-      const targetCategory = filters.category;
-      products = products.filter(
-        (p) =>
-          p.category === targetCategory ||
-          (p.categoryAncestors && p.categoryAncestors.includes(targetCategory)),
+    const categories = filters.category;
+    if (categories && categories.length > 0) {
+      products = products.filter((p) =>
+        categories.some(
+          (cat) =>
+            p.category === cat ||
+            (p.categoryAncestors && p.categoryAncestors.includes(cat)),
+        ),
       );
     }
 
-    if (filters.color) {
-      const targetColor = filters.color.toLowerCase();
+    const colors = filters.color;
+    if (colors && colors.length > 0) {
+      const targetColors = colors.map((c) => c.toLowerCase());
       products = products.filter(
         (p) =>
           p.colors &&
-          p.colors.some((c: string) => c.toLowerCase() === targetColor),
+          p.colors.some((c: string) => targetColors.includes(c.toLowerCase())),
       );
     }
 
-    if (filters.size) {
+    const sizes = filters.size;
+    if (sizes && sizes.length > 0) {
       products = products.filter(
-        (p) => p.sizes && p.sizes.includes(filters.size),
+        (p) => p.sizes && p.sizes.some((s: ProductSize) => sizes.includes(s)),
       );
     }
 
@@ -58,8 +64,9 @@ export class ProductsService {
       products = products.filter((p) => p.price <= maxPrice);
     }
 
-    if (filters.onSale !== undefined) {
-      if (filters.onSale) {
+    const onSale = filters.onSale;
+    if (onSale !== undefined) {
+      if (onSale) {
         products = products.filter((p) => p.salePercent > 0);
       } else {
         products = products.filter(
@@ -68,9 +75,10 @@ export class ProductsService {
       }
     }
 
-    if (filters.sortPrice) {
+    const sortPrice = filters.sortPrice;
+    if (sortPrice) {
       products.sort((a, b) => {
-        if (filters.sortPrice === 'asc') {
+        if (sortPrice === 'asc') {
           return a.price - b.price;
         } else {
           return b.price - a.price;

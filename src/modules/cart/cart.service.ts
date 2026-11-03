@@ -192,4 +192,21 @@ export class CartService {
     const items = await this.enrichCartItems(rawItems);
     return { message: 'Item removed from cart', items };
   }
+
+  async clearCart(cartId: string): Promise<void> {
+    const docRef = this.getCartRef(cartId);
+    const docSnap = await docRef.get();
+
+    if (!docSnap.exists) {
+      return; // If the cart doesn't exist, clearing it is inherently successful
+    }
+
+    await docRef.set(
+      {
+        items: [],
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+  }
 }

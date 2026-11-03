@@ -7,6 +7,8 @@ import {
   Param,
   Body,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { CartService } from './cart.service.js';
 import { AddItemDto, UpdateQuantityDto } from './dto/cart.dto.js';
@@ -47,5 +49,11 @@ export class CartController {
     @Param('cartItemId') cartItemId: string,
   ) {
     return await this.cartService.removeItem(userId, cartItemId);
+  }
+
+  @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async clearCart(@CurrentUserId() userId: string): Promise<void> {
+    await this.cartService.clearCart(userId);
   }
 }

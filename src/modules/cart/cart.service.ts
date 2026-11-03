@@ -198,7 +198,7 @@ export class CartService {
     const docSnap = await docRef.get();
 
     if (!docSnap.exists) {
-      return; // If the cart doesn't exist, clearing it is inherently successful
+      return;
     }
 
     await docRef.set(

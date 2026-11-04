@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './modules/products/products.module.js';
 import { FirebaseModule } from './modules/firebase/firebase.module.js';
 import { CategoriesModule } from './modules/categories/categories.module.js';
@@ -6,7 +7,14 @@ import { CartModule } from './modules/cart/cart.module.js';
 import { SupportModule } from './modules/support/support.module.js';
 
 @Module({
-  imports: [ProductsModule, FirebaseModule, CategoriesModule, CartModule, SupportModule],
+  imports: [
+    ProductsModule,
+    FirebaseModule,
+    CategoriesModule,
+    CartModule,
+    SupportModule,
+    ConfigModule.forRoot(),
+  ],
   controllers: [],
   providers: [],
 })

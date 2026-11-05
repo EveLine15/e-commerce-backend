@@ -31,7 +31,7 @@ export class SupportService {
         text: '🔥 Flash Sale Alert! Get 15% off your entire order today using code KICK15 at checkout!',
         timestamp: new Date().toISOString(),
       });
-    }, 12000);
+    }, 180000);
 
     this.promoIntervals.set(client.id, promoTimer);
   }
